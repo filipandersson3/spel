@@ -77,6 +77,14 @@ class PlayScene extends Phaser.Scene {
             this
         );
 
+        this.physics.add.overlap(
+            this.player,
+            this.foe,
+            this.playerHitFoe,
+            null,
+            this
+        );
+
         // krocka med platforms lagret
         this.physics.add.collider(this.player, this.platforms);
 
@@ -129,7 +137,7 @@ class PlayScene extends Phaser.Scene {
             this.player.setVelocityX(this.player.body.velocity.x*0.99);
             // Only show the idle animation if the player is footed
             // If this is not included, the player would look idle while jumping
-            if (this.player.body.onFloor() && this.player.body.velocity.x < 30) {
+            if (this.player.body.onFloor() && this.player.body.velocity.x < 25) {
                 this.player.play('idle', true);
                 this.player.body.velocity.x = 0;
             }
@@ -167,12 +175,28 @@ class PlayScene extends Phaser.Scene {
                 this.cameras.main.scrollX = playerMiddle + 50;
             }
         }
+        this.spiked++;
+        this.updateText();
+        if (this.spiked >= 2000) {
+            this.scene.pause();
+        }
+        if (Math.round(this.player.x) > 100) {
+            this.obstacle = this.physics.add.sprite(this.player.x+500, this.player.y, 'foe');
+            this.physics.add.collider(this.obstacle, this.platforms);
+            this.physics.add.overlap(
+                this.player,
+                this.obstacle,
+                this.playerHitFoe,
+                null,
+                this
+            );
+        }
     }
 
     // metoden updateText för att uppdatera overlaytexten i spelet
     updateText() {
         this.text.setText(
-            `Arrow keys to move. Space to jump. W to pause. Spiked: ${this.spiked}`
+            `Arrow keys to move. Space to jump. W to pause. Spiked: ${this.spiked} Distance: ${Math.round(this.player.x/32)}`
         );
     }
 
@@ -192,6 +216,10 @@ class PlayScene extends Phaser.Scene {
             repeat: 5
         });
         this.updateText();
+    }
+
+    playerHitFoe(player, foe) {
+        player.setVelocityX(player.body.velocity.x + 200)
     }
 
     // när vi skapar scenen så körs initAnims för att ladda spelarens animationer
