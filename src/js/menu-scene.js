@@ -13,7 +13,7 @@ class PreloadScene extends Phaser.Scene {
         // skapa texten för PAUSED
         // använder en font som laddats i base.njk från Google fonts
         // fixedW/H används för  att kunna centrera texten på skärmen
-        this.text = this.add.text(0, (this.game.config.height / 2) - 64, 'PAUSED', {
+        this.text = this.add.text(0, (this.game.config.height / 2) - 64, 'idiot :)', {
             fontFamily: '"Mochiy Pop P One"',
             fontSize: '64px',
             fill: '#ff0000',
