@@ -178,15 +178,27 @@ class PlayScene extends Phaser.Scene {
         this.spiked++;
         this.updateText();
         if (this.spiked >= 2000) {
-            this.scene.pause();
+            this.scene.restart();
         }
-        if (Math.round(this.player.x) > 100) {
+        if (Math.round(this.player.x)%Math.round(Math.random()*1000) == 0) {
             this.obstacle = this.physics.add.sprite(this.player.x+500, this.player.y, 'foe');
             this.physics.add.collider(this.obstacle, this.platforms);
             this.physics.add.overlap(
                 this.player,
                 this.obstacle,
                 this.playerHitFoe,
+                null,
+                this
+            );
+            this.obstacle.body.setVelocityX(-30);
+        }
+        if (Math.round(this.player.x)%Math.round(Math.random()*1000) == 0) {
+            this.zeunerts = this.physics.add.sprite(this.player.x+500, this.player.y, 'foe');
+            this.physics.add.collider(this.zeunerts, this.platforms);
+            this.physics.add.overlap(
+                this.player,
+                this.zeunerts,
+                this.playerHitZeunerts,
                 null,
                 this
             );
@@ -219,7 +231,12 @@ class PlayScene extends Phaser.Scene {
     }
 
     playerHitFoe(player, foe) {
-        player.setVelocityX(player.body.velocity.x + 200)
+        player.setVelocityX(player.body.velocity.x*0.99);
+    }
+
+    playerHitZeunerts(player, foe) {
+        player.setVelocityX(player.body.velocity.x + 30);
+        player.setVelocityY(player.body.velocity.y - 20);
     }
 
     // när vi skapar scenen så körs initAnims för att ladda spelarens animationer
