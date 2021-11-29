@@ -4,8 +4,8 @@ class PlayScene extends Phaser.Scene {
     }
 
     create() {
-        // variabel för att hålla koll på hur många gånger vi spikat oss själva
-        this.spiked = 0;
+        // variabel för att hålla koll på kyla
+        this.cold = 0;
 
         // ladda spelets bakgrundsbild, statisk
         // setOrigin behöver användas för att den ska ritas från top left
@@ -44,8 +44,9 @@ class PlayScene extends Phaser.Scene {
         this.player.setBounce(0.1);
         this.player.setCollideWorldBounds(false);
 
-        this.foe = this.physics.add.sprite(this.spawns.objects[0].x, this.spawns.objects[0].y, 'foe');
-        this.physics.add.collider(this.foe, this.platforms);
+        this.speed = 30;
+
+        this.zeunertsCounter = 0;
 
         // skapa en fysik-grupp
         this.spikes = this.physics.add.group({
@@ -99,6 +100,7 @@ class PlayScene extends Phaser.Scene {
 
         // lägg till en keyboard input för W
         this.keyObj = this.input.keyboard.addKey('W', true, false);
+        this.eKeyObj = this.input.keyboard.addKey('E', true, false);
 
         // exempel för att lyssna på events
         this.events.on('pause', function () {
@@ -119,6 +121,10 @@ class PlayScene extends Phaser.Scene {
             this.scene.launch('MenuScene');
         }
 
+        if (this.eKeyObj.isDown) {
+            this.speed = 60;
+        }
+
         // följande kod är från det tutorial ni gjort tidigare
         // Control the player with left or right keys
         if (this.cursors.left.isDown) {
@@ -127,13 +133,13 @@ class PlayScene extends Phaser.Scene {
                 this.player.play('walk', true);
             }
         } else if (this.cursors.right.isDown && !this.flipFlop) {
-            this.player.setVelocityX(this.player.body.velocity.x+30);
+            this.player.setVelocityX(this.player.body.velocity.x+this.speed);
             if (this.player.body.onFloor()) {
                 this.player.play('walk', true);
             }
             this.flipFlop = true;
         } else {
-            // If no keys are pressed, the player keeps still
+            // If no keys are pressed, the player glides :)
             this.player.setVelocityX(this.player.body.velocity.x*0.99);
             // Only show the idle animation if the player is footed
             // If this is not included, the player would look idle while jumping
@@ -145,9 +151,6 @@ class PlayScene extends Phaser.Scene {
                 this.flipFlop = false;
             }
         }
-        this.foe.setVelocityX(300);
-        this.foe.play('foeWalk', true);
-        this.foe.setFlipX(true);
 
         // Player can jump while walking any direction by pressing the space bar
         // or the 'UP' arrow
@@ -175,9 +178,9 @@ class PlayScene extends Phaser.Scene {
                 this.cameras.main.scrollX = playerMiddle + 50;
             }
         }
-        this.spiked++;
+        this.cold++;
         this.updateText();
-        if (this.spiked >= 2000) {
+        if (this.cold >= 2000) {
             this.scene.restart();
         }
         if (Math.round(this.player.x)%Math.round(Math.random()*1000) == 0) {
@@ -191,6 +194,7 @@ class PlayScene extends Phaser.Scene {
                 this
             );
             this.obstacle.body.setVelocityX(-30);
+            this.obstacle.setTint(0xFF0000);
         }
         if (Math.round(this.player.x)%Math.round(Math.random()*1000) == 0) {
             this.zeunerts = this.physics.add.sprite(this.player.x+500, this.player.y, 'foe');
@@ -202,13 +206,26 @@ class PlayScene extends Phaser.Scene {
                 null,
                 this
             );
+            this.zeunerts.setTint(0xFFFF00);
+        }
+        if (Math.round(this.player.x)%Math.round(Math.random()*1000) == 0) {
+            this.ramp = this.physics.add.sprite(this.player.x+500, this.player.y, 'foe');
+            this.physics.add.collider(this.ramp, this.platforms);
+            this.physics.add.collider(
+                this.player,
+                this.ramp,
+                this.playerHitRamp,
+                null,
+                this
+            );
+            this.ramp.setTint(0x0000FF);
         }
     }
 
     // metoden updateText för att uppdatera overlaytexten i spelet
     updateText() {
         this.text.setText(
-            `Arrow keys to move. Space to jump. W to pause. Spiked: ${this.spiked} Distance: ${Math.round(this.player.x/32)}`
+            `Zeunerts: ${this.zeunertsCounter} Cold: ${this.cold} Distance: ${Math.round(this.player.x/32)} Speed: ${Math.round(this.player.body.speed/10)}`
         );
     }
 
@@ -231,12 +248,20 @@ class PlayScene extends Phaser.Scene {
     }
 
     playerHitFoe(player, foe) {
-        player.setVelocityX(player.body.velocity.x*0.99);
+        player.setVelocityX(player.body.velocity.x*0.7);
+        foe.setX(0);
     }
 
-    playerHitZeunerts(player, foe) {
+    playerHitRamp(player, ramp) {
+        player.setVelocityX(player.body.velocity.x);
+        player.setVelocityY(player.body.velocity.y - 30);
+    }
+
+    playerHitZeunerts(player, zeunerts) {
         player.setVelocityX(player.body.velocity.x + 30);
         player.setVelocityY(player.body.velocity.y - 20);
+        this.zeunertsCounter++;
+        zeunerts.setX(0);
     }
 
     // när vi skapar scenen så körs initAnims för att ladda spelarens animationer
