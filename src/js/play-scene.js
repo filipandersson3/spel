@@ -6,6 +6,8 @@ class PlayScene extends Phaser.Scene {
     create() {
         // variabel för att hålla koll på kyla
         this.cold = 0;
+        this.game.zeunerts = this.game.zeunerts > 0 ? this.game.zeunerts : 0;
+        console.log(this.game);
 
         // ladda spelets bakgrundsbild, statisk
         // setOrigin behöver användas för att den ska ritas från top left
@@ -109,10 +111,14 @@ class PlayScene extends Phaser.Scene {
         this.events.on('resume', function () {
             console.log('Play scene resumed');
         });
+
+//        this.timerEvent = this.time.addEvent({ delay: 500, repeat: 0 });
+        this.rampSwitch = false;
     }
 
     // play scenens update metod
     update() {
+        console.log(this.rampSwitch)
         // för pause
         if (this.keyObj.isDown) {
             // pausa nuvarande scen
@@ -180,7 +186,7 @@ class PlayScene extends Phaser.Scene {
         }
         this.cold++;
         this.updateText();
-        if (this.cold >= 2000) {
+        if (this.cold >= 1000) {
             this.scene.restart();
         }
         if (Math.round(this.player.x)%Math.round(Math.random()*1000) == 0) {
@@ -209,9 +215,9 @@ class PlayScene extends Phaser.Scene {
             this.zeunerts.setTint(0xFFFF00);
         }
         if (Math.round(this.player.x)%Math.round(Math.random()*1000) == 0) {
-            this.ramp = this.physics.add.sprite(this.player.x+500, this.player.y, 'foe');
+            this.ramp = this.physics.add.sprite(this.player.x+500, this.game.config.height - 96, 'foe');
             this.physics.add.collider(this.ramp, this.platforms);
-            this.physics.add.collider(
+            this.physics.add.overlap(
                 this.player,
                 this.ramp,
                 this.playerHitRamp,
@@ -219,13 +225,15 @@ class PlayScene extends Phaser.Scene {
                 this
             );
             this.ramp.setTint(0x0000FF);
+            this.ramp.body.immovable = true;
+            this.ramp.body.moves = false;
         }
     }
 
     // metoden updateText för att uppdatera overlaytexten i spelet
     updateText() {
         this.text.setText(
-            `Zeunerts: ${this.zeunertsCounter} Cold: ${this.cold} Distance: ${Math.round(this.player.x/32)} Speed: ${Math.round(this.player.body.speed/10)}`
+            `Zeunerts: ${this.game.zeunerts} Cold: ${this.cold} Distance: ${Math.round(this.player.x/32)} Speed: ${Math.round(this.player.body.speed/10)}`
         );
     }
 
@@ -253,14 +261,20 @@ class PlayScene extends Phaser.Scene {
     }
 
     playerHitRamp(player, ramp) {
-        player.setVelocityX(player.body.velocity.x);
-        player.setVelocityY(player.body.velocity.y - 30);
+        if (!this.rampSwitch) {
+            player.setVelocityX(player.body.speed*0.7);
+            player.setVelocityY(player.body.speed*-0.7);
+            console.log(this.rampSwitch);
+            this.rampSwitch = true;
+            this.time.addEvent({ delay: 5000, callback: !this.rampSwitch, callbackScope: this});
+        }
+        
     }
 
     playerHitZeunerts(player, zeunerts) {
         player.setVelocityX(player.body.velocity.x + 30);
         player.setVelocityY(player.body.velocity.y - 20);
-        this.zeunertsCounter++;
+        this.game.zeunerts++;
         zeunerts.setX(0);
     }
 
