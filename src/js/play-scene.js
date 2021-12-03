@@ -115,7 +115,13 @@ class PlayScene extends Phaser.Scene {
 //        this.timerEvent = this.time.addEvent({ delay: 500, repeat: 0 });
         this.rampSwitch = false;
 
-        this.coldMeter = this.add.rectangle(200, 200, 200, 10, 0x9966ff).setScrollFactor(0);
+        this.HUDBar = this.add.rectangle(450, 35, 900, 70, 0x303030).setScrollFactor(0);
+
+        this.HUDBar2 = this.add.rectangle(270, 35, 205, 20, 0x545454).setScrollFactor(0);
+
+        this.HUDColdText = this.add.text(60, 25, 'Temperature:', { fontFamily: '"Press Start 2P", Courier, monospace' }).setScrollFactor(0);
+
+        this.coldMeter = this.add.rectangle(270, 35, 200, 10, 0x9966ff).setScrollFactor(0);
 
         this.maxColdMeterWidth = 0.2;
     }
