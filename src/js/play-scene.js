@@ -194,8 +194,8 @@ class PlayScene extends Phaser.Scene {
         if (this.cold >= 1000) {
             this.scene.restart();
         }
-        if (Math.round(this.player.x)%Math.round(Math.random()*1000) == 0) {
-            this.obstacle = this.physics.add.sprite(this.player.x+500, this.player.y, 'foe');
+        if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(50000/this.player.body.velocity.x) == 0) {
+            this.obstacle = this.physics.add.sprite(this.player.x+500, this.game.config.height - 96, 'foe');
             this.physics.add.collider(this.obstacle, this.platforms);
             this.physics.add.overlap(
                 this.player,
@@ -207,8 +207,8 @@ class PlayScene extends Phaser.Scene {
             this.obstacle.body.setVelocityX(-30);
             this.obstacle.setTint(0xFF0000);
         }
-        if (Math.round(this.player.x)%Math.round(Math.random()*1000) == 0) {
-            this.zeunerts = this.physics.add.sprite(this.player.x+500, this.player.y, 'foe');
+        if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(30000/this.player.body.velocity.x) == 0) {
+            this.zeunerts = this.physics.add.sprite(this.player.x+500, this.game.config.height - 96, 'foe');
             this.physics.add.collider(this.zeunerts, this.platforms);
             this.physics.add.overlap(
                 this.player,
@@ -219,7 +219,7 @@ class PlayScene extends Phaser.Scene {
             );
             this.zeunerts.setTint(0xFFFF00);
         }
-        if (Math.round(this.player.x)%Math.round(Math.random()*1000) == 0) {
+        if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(70000/this.player.body.velocity.x) == 0) {
             this.ramp = this.physics.add.sprite(this.player.x+500, this.game.config.height - 96, 'foe');
             this.physics.add.collider(this.ramp, this.platforms);
             this.physics.add.overlap(
