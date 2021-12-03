@@ -46,7 +46,7 @@ class PlayScene extends Phaser.Scene {
         this.player.setBounce(0.1);
         this.player.setCollideWorldBounds(false);
 
-        this.speed = 30;
+        this.speed = 90;
 
         this.zeunertsCounter = 0;
 
@@ -114,6 +114,10 @@ class PlayScene extends Phaser.Scene {
 
 //        this.timerEvent = this.time.addEvent({ delay: 500, repeat: 0 });
         this.rampSwitch = false;
+
+        this.coldMeter = this.add.rectangle(200, 200, 200, 10, 0x9966ff).setScrollFactor(0);
+
+        this.maxColdMeterWidth = 0.2;
     }
 
     // play scenens update metod
@@ -185,6 +189,7 @@ class PlayScene extends Phaser.Scene {
             }
         }
         this.cold++;
+        this.coldMeter.width = (1000-this.cold)*this.maxColdMeterWidth;
         this.updateText();
         if (this.cold >= 1000) {
             this.scene.restart();
@@ -261,14 +266,18 @@ class PlayScene extends Phaser.Scene {
     }
 
     playerHitRamp(player, ramp) {
-        if (!this.rampSwitch) {
+        if (!this.rampSwitch && (player.x+player.width) > ramp.x+ramp.width/2 && (player.y+player.height) > ramp.y+ramp.height/2) {
             player.setVelocityX(player.body.speed*0.7);
             player.setVelocityY(player.body.speed*-0.7);
             console.log(this.rampSwitch);
             this.rampSwitch = true;
-            this.time.addEvent({ delay: 5000, callback: !this.rampSwitch, callbackScope: this});
+            this.time.addEvent({ delay: 1000, callback: this.changeRampSwitch, callbackScope: this});
         }
         
+    }
+
+    changeRampSwitch() {
+        this.rampSwitch = false;
     }
 
     playerHitZeunerts(player, zeunerts) {
