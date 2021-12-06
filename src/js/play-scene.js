@@ -244,6 +244,22 @@ class PlayScene extends Phaser.Scene {
             this.ramp.body.immovable = true;
             this.ramp.body.moves = false;
         }
+        if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(90000/this.player.body.velocity.x) == 0) {
+            this.skyPlatform = this.physics.add.sprite(this.player.x+500, this.game.config.height - 300, 'foe');
+            this.physics.add.collider(this.skyPlatform, this.player);
+            this.skyPlatform.body.immovable = true;
+            this.skyPlatform.body.moves = false;
+            this.zeunerts = this.physics.add.sprite(this.player.x+500, this.game.config.height - 360, 'foe');
+            this.physics.add.collider(this.zeunerts, this.skyPlatform);
+            this.physics.add.overlap(
+                this.player,
+                this.zeunerts,
+                this.playerHitZeunerts,
+                null,
+                this
+            );
+            this.zeunerts.setTint(0xFFFF00);
+        }
     }
 
     // metoden updateText för att uppdatera overlaytexten i spelet
