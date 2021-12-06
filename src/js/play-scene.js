@@ -203,7 +203,10 @@ class PlayScene extends Phaser.Scene {
         this.coldMeter.width = (1000-this.cold)*this.maxColdMeterWidth;
         this.updateText();
         if (this.cold >= 1000) {
-            this.scene.restart();
+            this.player.setVelocityX(0);
+            this.player.setVelocityY(0);
+            this.player.play('jump', true)
+            this.time.addEvent({ delay: 5000, callback: this.restart, callbackScope: this});
         }
         if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(50000/this.player.body.velocity.x) == 0) {
             this.obstacle = this.physics.add.sprite(this.player.x+500, this.game.config.height - 96, 'foe');
@@ -273,6 +276,10 @@ class PlayScene extends Phaser.Scene {
         this.HUDDistanceText.setText(
             `${Math.round(this.player.x/32)} m`
         );
+    }
+
+    restart() {
+        this.scene.restart();
     }
 
     // när spelaren landar på en spik, då körs följande metod
