@@ -98,7 +98,6 @@ class PlayScene extends Phaser.Scene {
             fill: '#ffffff'
         });
         this.text.setScrollFactor(0);
-        this.updateText();
 
         // lägg till en keyboard input för W
         this.keyObj = this.input.keyboard.addKey('W', true, false);
@@ -117,13 +116,19 @@ class PlayScene extends Phaser.Scene {
 
         this.HUDBar = this.add.rectangle(450, 35, 900, 70, 0x303030).setScrollFactor(0);
 
-        this.HUDBar2 = this.add.rectangle(270, 35, 205, 20, 0x545454).setScrollFactor(0);
+        this.HUDBar2 = this.add.rectangle(350, 33, 205, 20, 0x545454).setScrollFactor(0);
 
-        this.HUDColdText = this.add.text(60, 25, 'Temperature:', { fontFamily: '"Press Start 2P", Courier, monospace' }).setScrollFactor(0);
+        this.HUDColdText = this.add.text(40, 25, 'Temperature:', { fontFamily: '"PressStart2P"' }).setScrollFactor(0);
 
-        this.coldMeter = this.add.rectangle(270, 35, 200, 10, 0x9966ff).setScrollFactor(0);
+        this.coldMeter = this.add.rectangle(350, 33, 200, 10, 0x9966ff).setScrollFactor(0);
 
         this.maxColdMeterWidth = 0.2;
+
+        this.HUDZeunertsText = this.add.text(500, 25, 'Zeunerts:', { fontFamily: '"PressStart2P"' }).setScrollFactor(0);
+
+        this.HUDDistanceText = this.add.text(720, 25, '0 m', { fontFamily: '"PressStart2P"' }).setScrollFactor(0);
+
+        this.updateText();
     }
 
     // play scenens update metod
@@ -245,6 +250,12 @@ class PlayScene extends Phaser.Scene {
     updateText() {
         this.text.setText(
             `Zeunerts: ${this.game.zeunerts} Cold: ${this.cold} Distance: ${Math.round(this.player.x/32)} Speed: ${Math.round(this.player.body.speed/10)}`
+        );
+        this.HUDZeunertsText.setText(
+            `Zeunerts: ${this.game.zeunerts}`
+        );
+        this.HUDDistanceText.setText(
+            `${Math.round(this.player.x/32)} m`
         );
     }
 
