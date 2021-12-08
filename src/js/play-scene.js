@@ -130,12 +130,19 @@ class PlayScene extends Phaser.Scene {
 
         this.updateText();
 
-        this.sign = this.physics.add.sprite(this.game.maxdistance, this.game.config.height - 96, 'sign').setScale(2);
-        this.physics.add.collider(this.sign, this.platforms);
-        this.sign.body.immovable = true;
-        this.sign.body.moves = false;
-        this.signText = this.add.text(0, this.game.config.height - 192, `${Math.round(this.game.maxdistance/32)} m`, { fontFamily: '"PressStart2P"' });
-        this.signText.x = (this.game.maxdistance - this.signText.width/2);
+        this.shop = this.physics.add.sprite(70, this.game.config.height - 136, 'shop').setScale(3);
+        this.physics.add.collider(this.shop, this.platforms);
+        this.shop.body.immovable = true;
+        this.shop.body.moves = false;
+
+        if (this.game.maxdistance > 500) {
+            this.sign = this.physics.add.sprite(this.game.maxdistance, this.game.config.height - 96, 'sign').setScale(2);
+            this.physics.add.collider(this.sign, this.platforms);
+            this.sign.body.immovable = true;
+            this.sign.body.moves = false;
+            this.signText = this.add.text(0, this.game.config.height - 192, `${Math.round(this.game.maxdistance/32)} m`, { fontFamily: '"PressStart2P"' });
+            this.signText.x = (this.game.maxdistance - this.signText.width/2);
+        }
     }
 
     // play scenens update metod
@@ -244,7 +251,7 @@ class PlayScene extends Phaser.Scene {
             this.zeunerts.setTint(0xFFFF00);
         }
         if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(70000/this.player.body.velocity.x) == 0) {
-            this.ramp = this.physics.add.sprite(this.player.x+500, this.game.config.height - 96, 'foe');
+            this.ramp = this.physics.add.sprite(this.player.x+500, this.game.config.height - 80, 'ramp').setScale(2);
             this.physics.add.collider(this.ramp, this.platforms);
             this.physics.add.overlap(
                 this.player,
@@ -253,7 +260,6 @@ class PlayScene extends Phaser.Scene {
                 null,
                 this
             );
-            this.ramp.setTint(0x0000FF);
             this.ramp.body.immovable = true;
             this.ramp.body.moves = false;
         }
