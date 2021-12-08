@@ -129,6 +129,13 @@ class PlayScene extends Phaser.Scene {
         this.HUDDistanceText = this.add.text(720, 25, '0 m', { fontFamily: '"PressStart2P"' }).setScrollFactor(0);
 
         this.updateText();
+
+        this.sign = this.physics.add.sprite(this.game.maxdistance, this.game.config.height - 96, 'sign').setScale(2);
+        this.physics.add.collider(this.sign, this.platforms);
+        this.sign.body.immovable = true;
+        this.sign.body.moves = false;
+        this.signText = this.add.text(0, this.game.config.height - 192, `${Math.round(this.game.maxdistance/32)} m`, { fontFamily: '"PressStart2P"' });
+        this.signText.x = (this.game.maxdistance - this.signText.width/2);
     }
 
     // play scenens update metod
@@ -199,12 +206,15 @@ class PlayScene extends Phaser.Scene {
                 this.cameras.main.scrollX = playerMiddle + 50;
             }
         }
-        this.cold++;
+        if (this.player.x > 500) {
+            this.cold++;
+        }
         this.coldMeter.width = (1000-this.cold)*this.maxColdMeterWidth;
         this.updateText();
         if (this.cold >= 1000) {
             this.player.setVelocityX(0);
-            this.player.setVelocityY(0);
+            this.player.setVelocityY(300);
+            this.coldMeter.width = 0;
             this.player.play('jump', true)
             this.time.addEvent({ delay: 5000, callback: this.restart, callbackScope: this});
         }
@@ -273,12 +283,18 @@ class PlayScene extends Phaser.Scene {
         this.HUDZeunertsText.setText(
             `Zeunerts: ${this.game.zeunerts}`
         );
-        this.HUDDistanceText.setText(
-            `${Math.round(this.player.x/32)} m`
-        );
+        if (Math.round(this.player.x/32) > 9) {
+            this.HUDDistanceText.setText(
+                `${Math.round(this.player.x/32)-9} m`
+            );
+        }
+        
     }
 
     restart() {
+        if (this.player.x > this.game.maxdistance) {
+            this.game.maxdistance = this.player.x;
+        }
         this.scene.restart();
     }
 

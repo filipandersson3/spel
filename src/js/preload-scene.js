@@ -8,6 +8,8 @@ class PreloadScene extends Phaser.Scene {
         this.load.setBaseURL('/assets');
         //this.load.image('background', '/images/background.png');
         this.load.image('spike', '/images/spike.png');
+        this.load.image('sign', '/images/sign.png');
+        this.load.image('ramp', '/images/ramp.png');
         this.load.atlas(
             'player',
             '/images/jefrens_hero.png',
@@ -22,6 +24,7 @@ class PreloadScene extends Phaser.Scene {
         // här laddar vi in en tilemap med spelets "karta"
         this.load.tilemapTiledJSON('map', '/tilemaps/link.json');
         this.add.text(0, 0, '', { fontFamily: '"PressStart2P"' });
+        this.game.maxdistance = 0;
     }
 
     create() {
