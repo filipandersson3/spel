@@ -27,6 +27,7 @@ class PreloadScene extends Phaser.Scene {
         this.load.tilemapTiledJSON('map', '/tilemaps/link.json');
         this.add.text(0, 0, '', { fontFamily: '"PressStart2P"' });
         this.game.maxdistance = 0;
+        this.game.speed = 90;
     }
 
     create() {

@@ -41,12 +41,15 @@ class PlayScene extends Phaser.Scene {
         // );
         // platforms.setCollision(1, true, true);
 
+        this.shop = this.physics.add.sprite(70, this.game.config.height - 136, 'shop').setScale(3);
+        this.physics.add.collider(this.shop, this.platforms);
+        this.shop.body.immovable = true;
+        this.shop.body.moves = false;
+
         // skapa en spelare och ge den studs
         this.player = this.physics.add.sprite(this.spawns.objects[0].x, this.spawns.objects[0].y, 'player');
         this.player.setBounce(0.1);
         this.player.setCollideWorldBounds(false);
-
-        this.speed = 90;
 
         this.zeunertsCounter = 0;
 
@@ -102,6 +105,7 @@ class PlayScene extends Phaser.Scene {
         // lägg till en keyboard input för W
         this.keyObj = this.input.keyboard.addKey('W', true, false);
         this.eKeyObj = this.input.keyboard.addKey('E', true, false);
+        this.fKeyObj = this.input.keyboard.addKey('F', true, false);
 
         // exempel för att lyssna på events
         this.events.on('pause', function () {
@@ -130,11 +134,6 @@ class PlayScene extends Phaser.Scene {
 
         this.updateText();
 
-        this.shop = this.physics.add.sprite(70, this.game.config.height - 136, 'shop').setScale(3);
-        this.physics.add.collider(this.shop, this.platforms);
-        this.shop.body.immovable = true;
-        this.shop.body.moves = false;
-
         if (this.game.maxdistance > 500) {
             this.sign = this.physics.add.sprite(this.game.maxdistance, this.game.config.height - 96, 'sign').setScale(2);
             this.physics.add.collider(this.sign, this.platforms);
@@ -143,11 +142,14 @@ class PlayScene extends Phaser.Scene {
             this.signText = this.add.text(0, this.game.config.height - 192, `${Math.round(this.game.maxdistance/32)} m`, { fontFamily: '"PressStart2P"' });
             this.signText.x = (this.game.maxdistance - this.signText.width/2);
         }
+
+        this.shopText = this.add.text(5, 220, `purchase my wares \n press 'E'`, { fontFamily: '"PressStart2P"' });
+        this.isShopOpen = false;
     }
 
     // play scenens update metod
     update() {
-        console.log(this.rampSwitch)
+        console.log(this.game.speed);
         // för pause
         if (this.keyObj.isDown) {
             // pausa nuvarande scen
@@ -155,9 +157,29 @@ class PlayScene extends Phaser.Scene {
             // starta menyscenene
             this.scene.launch('MenuScene');
         }
-
-        if (this.eKeyObj.isDown) {
-            this.speed = 60;
+        if (this.player.x < 250) {
+            if (Phaser.Input.Keyboard.JustDown(this.eKeyObj)) {
+                if (this.isShopOpen) {
+                    this.scene.pause('ShopScene');
+                    this.scene.setVisible(false, 'ShopScene');
+                    this.isShopOpen = false;
+                } else {
+                    this.scene.launch('ShopScene');
+                    this.isShopOpen = true;
+                }
+            }
+            this.shopText.alpha = 1;
+        } else {
+            this.shopText.alpha = 0;
+            this.scene.pause('ShopScene');
+            this.scene.setVisible(false, 'ShopScene');
+            this.isShopOpen = false;
+        }
+        if (this.isShopOpen) {
+            if (Phaser.Input.Keyboard.JustDown(this.fKeyObj) && this.game.zeunerts >= 10) {
+                this.game.speed += 30;
+                this.game.zeunerts -= 10;
+            }
         }
 
         // följande kod är från det tutorial ni gjort tidigare
@@ -168,7 +190,7 @@ class PlayScene extends Phaser.Scene {
                 this.player.play('walk', true);
             }
         } else if (this.cursors.right.isDown && !this.flipFlop) {
-            this.player.setVelocityX(this.player.body.velocity.x+this.speed);
+            this.player.setVelocityX(this.player.body.velocity.x+this.game.speed);
             if (this.player.body.onFloor()) {
                 this.player.play('walk', true);
             }
@@ -333,7 +355,6 @@ class PlayScene extends Phaser.Scene {
         if (!this.rampSwitch && (player.x+player.width) > ramp.x+ramp.width/2 && (player.y+player.height) > ramp.y+ramp.height/2) {
             player.setVelocityX(player.body.speed*0.7);
             player.setVelocityY(player.body.speed*-0.7);
-            console.log(this.rampSwitch);
             this.rampSwitch = true;
             this.time.addEvent({ delay: 1000, callback: this.changeRampSwitch, callbackScope: this});
         }
