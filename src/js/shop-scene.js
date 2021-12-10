@@ -13,11 +13,33 @@ class PreloadScene extends Phaser.Scene {
         // skapa texten för PAUSED
         // använder en font som laddats i base.njk från Google fonts
         // fixedW/H används för  att kunna centrera texten på skärmen
-        this.text = this.add.text(0, (this.game.config.height / 2) - 64, 'buy my shit', {
+        this.HUDBar = this.add.rectangle(450, 260, 480, 300, 0x303030);
+        this.text = this.add.text(0, (this.game.config.height / 2) - 90, 'Penguin guy store', {
+            fontFamily: '"PressStart2P"',
+            fontSize: '18px',
+            fill: '#ffffff',
+            align: 'center',
+            fixedWidth: this.game.config.width,
+            fixedHeight: this.game.config.height,
+        });
+        this.text = this.add.text(230, (this.game.config.height / 2) - 32, 'Plank: 10 Z$', {
             fontFamily: '"PressStart2P"',
             fontSize: '16px',
-            fill: '#ff0000',
-            align: 'center',
+            fill: '#ffffff',
+            fixedWidth: this.game.config.width,
+            fixedHeight: this.game.config.height,
+        });
+        this.text = this.add.text(230, (this.game.config.height / 2), 'Normal Skis: 20 Z$', {
+            fontFamily: '"PressStart2P"',
+            fontSize: '16px',
+            fill: '#ffffff',
+            fixedWidth: this.game.config.width,
+            fixedHeight: this.game.config.height,
+        });
+        this.text = this.add.text(230, (this.game.config.height / 2) + 32, 'Bow-Flex 3000 Skis: 20 Z$', {
+            fontFamily: '"PressStart2P"',
+            fontSize: '16px',
+            fill: '#ffffff',
             fixedWidth: this.game.config.width,
             fixedHeight: this.game.config.height,
         });

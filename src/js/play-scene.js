@@ -177,7 +177,7 @@ class PlayScene extends Phaser.Scene {
         }
         if (this.isShopOpen) {
             if (Phaser.Input.Keyboard.JustDown(this.fKeyObj) && this.game.zeunerts >= 10) {
-                this.game.speed += 30;
+                this.game.speed += 10;
                 this.game.zeunerts -= 10;
             }
         }
