@@ -4,6 +4,8 @@ import PreloadScene from './preload-scene';
 import MenuScene from './menu-scene';
 import ShopScene from './shop-scene';
 
+const eventsCenter = new Phaser.Events.EventEmitter()
+
 // spelets config
 const config = {
     type: Phaser.AUTO,
