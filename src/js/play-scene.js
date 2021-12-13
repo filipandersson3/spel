@@ -145,6 +145,11 @@ class PlayScene extends Phaser.Scene {
 
         this.shopText = this.add.text(5, 220, `purchase my wares \n press 'E'`, { fontFamily: '"PressStart2P"' });
         this.isShopOpen = false;
+
+        this.shopGuy = this.physics.add.sprite(70, this.game.config.height-136, 'shopGuy').setScale(3);
+        this.shopGuy.body.immovable = true;
+        this.shopGuy.body.moves = false;
+        this.shopGuy.play('shopGuyIdle', true);
     }
 
     // play scenens update metod
@@ -382,6 +387,17 @@ class PlayScene extends Phaser.Scene {
                 end: 4
             }),
             frameRate: 10,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'shopGuyIdle',
+            frames: this.anims.generateFrameNames('shopGuy', {
+                prefix: '',
+                start: 0,
+                end: 5
+            }),
+            frameRate: 3,
             repeat: -1
         });
 
