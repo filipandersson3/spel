@@ -253,7 +253,7 @@ class PlayScene extends Phaser.Scene {
             this.time.addEvent({ delay: 5000, callback: this.restart, callbackScope: this});
         }
         if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(50000/this.player.body.velocity.x) == 0) {
-            this.obstacle = this.physics.add.sprite(this.player.x+500, this.game.config.height - 96, 'foe');
+            this.obstacle = this.physics.add.sprite(this.player.x+500, this.game.config.height - 96, 'snowy');
             this.physics.add.collider(this.obstacle, this.platforms);
             this.physics.add.overlap(
                 this.player,
@@ -266,7 +266,7 @@ class PlayScene extends Phaser.Scene {
             this.obstacle.setTint(0xFF0000);
         }
         if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(30000/this.player.body.velocity.x) == 0) {
-            this.zeunerts = this.physics.add.sprite(this.player.x+500, this.game.config.height - 96, 'foe');
+            this.zeunerts = this.physics.add.sprite(this.player.x+500, this.game.config.height - 96, 'zeunerts');
             this.physics.add.collider(this.zeunerts, this.platforms);
             this.physics.add.overlap(
                 this.player,
@@ -275,7 +275,6 @@ class PlayScene extends Phaser.Scene {
                 null,
                 this
             );
-            this.zeunerts.setTint(0xFFFF00);
         }
         if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(70000/this.player.body.velocity.x) == 0) {
             this.ramp = this.physics.add.sprite(this.player.x+500, this.game.config.height - 80, 'ramp').setScale(2);
@@ -296,7 +295,7 @@ class PlayScene extends Phaser.Scene {
             this.skyPlatform.body.immovable = true;
             this.skyPlatform.body.moves = false;
             for (var i = 0; i<3; i++) {
-                this.zeunerts = this.physics.add.sprite(this.player.x+452+(i*48), this.game.config.height - 360, 'foe');
+                this.zeunerts = this.physics.add.sprite(this.player.x+452+(i*48), this.game.config.height - 360, 'zeunerts');
                 this.physics.add.collider(this.zeunerts, this.skyPlatform);
                 this.physics.add.overlap(
                     this.player,
@@ -305,7 +304,7 @@ class PlayScene extends Phaser.Scene {
                     null,
                     this
                 );
-                this.zeunerts.setTint(0xFFFF00);
+                this.icicle = this.physics.add.sprite(this.player.x+452+(i*48), this.game.config.height - 312, 'icicle');
             }
         }
     }
