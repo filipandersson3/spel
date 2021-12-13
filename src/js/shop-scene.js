@@ -29,7 +29,8 @@ class PreloadScene extends Phaser.Scene {
             fixedWidth: this.game.config.width,
             fixedHeight: this.game.config.height,
         })
-        .setData("cost","10");
+        .setData("cost","10")
+        .setData("speedGain", "10");
 
         this.textItem2 = this.add.text(230, (this.game.config.height / 2), 'Normal Skis: 20 Z$', {
             fontFamily: '"PressStart2P"',
@@ -38,7 +39,8 @@ class PreloadScene extends Phaser.Scene {
             fixedWidth: this.game.config.width,
             fixedHeight: this.game.config.height,
         })
-        .setData("cost","20");
+        .setData("cost","20")
+        .setData("speedGain", "20");
 
         this.textItem3 = this.add.text(230, (this.game.config.height / 2) + 32, 'Bow-Flex 3000 Skis: 40 Z$', {
             fontFamily: '"PressStart2P"',
@@ -47,9 +49,20 @@ class PreloadScene extends Phaser.Scene {
             fixedWidth: this.game.config.width,
             fixedHeight: this.game.config.height,
         })
-        .setData("cost","30");
+        .setData("cost","40")
+        .setData("speedGain","30");
 
-        this.itemList = [this.textItem1,this.textItem2,this.textItem3];
+        this.textItem4 = this.add.text(230, (this.game.config.height / 2) + 64, 'Mega Blast 7000 Skis: 100 Z$', {
+            fontFamily: '"PressStart2P"',
+            fontSize: '16px',
+            fill: '#ffffff',
+            fixedWidth: this.game.config.width,
+            fixedHeight: this.game.config.height,
+        })
+        .setData("cost","100")
+        .setData("speedGain","50");
+
+        this.itemList = [this.textItem1,this.textItem2,this.textItem3,this.textItem4];
         this.cursors = this.input.keyboard.createCursorKeys();
         this.shopCursor = this.add.rectangle(220, 198, 5, 5, 0xffffff);
         this.cursorPos = 0;
@@ -70,11 +83,19 @@ class PreloadScene extends Phaser.Scene {
         }
         this.shopCursor.y = 198+this.cursorPos*32
         if (Phaser.Input.Keyboard.JustDown(this.cursors.left)) {
-            if (this.game.zeunerts >= this.itemList[this.cursorPos].getData("cost")) {
-                this.itemList[this.cursorPos].setTint(0x969696);
+            if (this.game.zeunerts >= this.itemList[this.cursorPos].getData("cost")
+            && this.game.upgrades[this.cursorPos] == false) {
                 console.log("item " + this.cursorPos + " bought");
                 this.game.zeunerts -= this.itemList[this.cursorPos].getData("cost");
+                this.game.upgrades[this.cursorPos] = true;
+                this.game.speed += parseInt(this.itemList[this.cursorPos].getData("speedGain"));
             }
+        } //får inte köpa samma sak flera gånger och gråtexten måste stanna
+        for (let i = 0; i < this.game.upgrades.length; i++) {
+            if (this.game.upgrades[i] == true) {
+                this.itemList[i].setTint(0x969696);
+            }
+            
         }
     }
 }

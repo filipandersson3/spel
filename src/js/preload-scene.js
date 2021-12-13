@@ -28,6 +28,8 @@ class PreloadScene extends Phaser.Scene {
         this.add.text(0, 0, '', { fontFamily: '"PressStart2P"' });
         this.game.maxdistance = 0;
         this.game.speed = 90;
+        this.game.upgrades = [false,false,false,false];
+        this.game.zeunerts = 90;
     }
 
     create() {
