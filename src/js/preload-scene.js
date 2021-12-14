@@ -33,6 +33,7 @@ class PreloadScene extends Phaser.Scene {
         );
         this.load.image('tiles', '/tilesets/jefrens_tilesheet.png');
         this.load.atlas('shopGuy', '/images/shopGuy.png', '/images/shopGuy.json')
+        this.load.atlas('penguin', '/images/penguin.png', '/images/penguin.json')
         // här laddar vi in en tilemap med spelets "karta"
         this.load.tilemapTiledJSON('map', '/tilemaps/link.json');
         this.add.text(0, 0, '', { fontFamily: '"PressStart2P"' });

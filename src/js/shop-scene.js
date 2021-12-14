@@ -7,6 +7,7 @@ class PreloadScene extends Phaser.Scene {
         // Det går att göra så att input lyssnar på spelet
         // nu är det på scenen, därför behöver vi skapa input igen
         this.keyObj = this.input.keyboard.addKey('E', true, false);
+        this.fkeyObj = this.input.keyboard.addKey('F', true, false);
 
         // spelets config om vi behöver något från den, som width height
         // console.log(this.game.config)
@@ -82,7 +83,7 @@ class PreloadScene extends Phaser.Scene {
             }
         }
         this.shopCursor.y = 198+this.cursorPos*32
-        if (Phaser.Input.Keyboard.JustDown(this.cursors.left)) {
+        if (Phaser.Input.Keyboard.JustDown(this.fkeyObj)) {
             if (this.game.zeunerts >= this.itemList[this.cursorPos].getData("cost")
             && this.game.upgrades[this.cursorPos] == false) {
                 console.log("item " + this.cursorPos + " bought");

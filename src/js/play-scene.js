@@ -52,7 +52,7 @@ class PlayScene extends Phaser.Scene {
         this.shopGuy.play('shopGuyIdle', true);
 
         // skapa en spelare och ge den studs
-        this.player = this.physics.add.sprite(this.spawns.objects[0].x, this.spawns.objects[0].y, 'player');
+        this.player = this.physics.add.sprite(this.spawns.objects[0].x, this.spawns.objects[0].y, 'penguin');
         this.player.setBounce(0.1);
         this.player.setCollideWorldBounds(false);
 
@@ -139,6 +139,11 @@ class PlayScene extends Phaser.Scene {
 
         this.updateText();
 
+        this.worldWall1 = this.physics.add.sprite(-70, this.game.config.height - 136, 'shop').setScale(3,10);
+        this.physics.add.collider(this.worldWall1, this.player);
+        this.worldWall1.body.moves = false;
+        this.worldWall1.body.immovable = true;
+
         if (this.game.maxdistance > 500) {
             this.sign = this.physics.add.sprite(this.game.maxdistance, this.game.config.height - 96, 'sign').setScale(2);
             this.physics.add.collider(this.sign, this.platforms);
@@ -156,6 +161,8 @@ class PlayScene extends Phaser.Scene {
         this.shopmusic = this.sound.add('shopmusic');
         this.shopmusic.play({loop:true});
         this.freezing = this.sound.add('freezing');
+
+        this.player.on('animationcomplete', this.animcomplete);
     }
 
     // play scenens update metod
@@ -218,18 +225,32 @@ class PlayScene extends Phaser.Scene {
             }
         } else if (this.cursors.right.isDown && !this.flipFlop) {
             this.player.setVelocityX(this.player.body.velocity.x+this.game.speed);
-            if (this.player.body.onFloor()) {
-                this.player.play('walk', true);
-            }
             this.flipFlop = true;
         } else {
             // If no keys are pressed, the player glides :)
             this.player.setVelocityX(this.player.body.velocity.x*0.99);
             // Only show the idle animation if the player is footed
             // If this is not included, the player would look idle while jumping
-            if (this.player.body.onFloor() && this.player.body.velocity.x < 25) {
-                this.player.play('idle', true);
-                this.player.body.velocity.x = 0;
+            if (this.player.body.onFloor()) {
+                if (this.player.body.velocity.x < 25) {
+                    this.player.play('idle', true);
+                    this.player.body.velocity.x = 0;
+                } else {
+                    if (this.player.body.velocity.y < -25) {
+                        this.player.play('slideLand', true);
+                    } else if (this.player.body.velocity.x < 500) {
+                        this.player.play('walk', true);
+                    } else {
+                        if (!(this.player.anims.currentAnim.key === 'slide') &&
+                            !(this.player.anims.currentAnim.key === 'slideLand')) {
+                            this.player.play('slideStart', true);
+                        }
+                        else {
+                            this.player.play('slide', true);
+                        }
+                    }
+                }
+                
             }
             if (this.cursors.right.isUp) {
                 this.flipFlop = false;
@@ -240,10 +261,14 @@ class PlayScene extends Phaser.Scene {
         // or the 'UP' arrow
         if (
             (this.cursors.space.isDown || this.cursors.up.isDown) &&
-            this.player.body.onFloor()
-        ) {
+            this.player.body.onFloor()) 
+        {
             this.player.setVelocityY(-350);
-            this.player.play('jump', true);
+            if (this.player.body.velocity.x < 500) {
+                this.player.play('jump', true);
+            } else {
+                this.player.play('slideJump', true);
+            }
         }
 
         if (this.player.body.velocity.x > 0) {
@@ -271,13 +296,13 @@ class PlayScene extends Phaser.Scene {
             this.player.setVelocityX(0);
             this.player.setVelocityY(300);
             this.coldMeter.width = 0;
-            this.player.play('jump', true)
             if (this.racemusic.isPaused == false) {
                 this.racemusic.pause();
             }
             if (this.freezing.isPlaying == false && this.player.x > 500) {
                 this.freezing.play({volume: 0.6});
             }
+            this.player.play('slideLand', true);
             this.time.addEvent({ delay: 5000, callback: this.restart, callbackScope: this});
         }
         if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(50000/this.player.body.velocity.x) == 0) {
@@ -363,6 +388,12 @@ class PlayScene extends Phaser.Scene {
         this.scene.restart();
     }
 
+    animcomplete() {
+        if (this.body.onFloor() && this.body.velocity.x > 500) {
+            this.play('slide', true);
+        }
+    }
+
     // när spelaren landar på en spik, då körs följande metod
     playerHit(player, spike) {
         this.spiked++;
@@ -413,12 +444,12 @@ class PlayScene extends Phaser.Scene {
     initAnims() {
         this.anims.create({
             key: 'walk',
-            frames: this.anims.generateFrameNames('player', {
-                prefix: 'jefrens_',
-                start: 1,
-                end: 4
+            frames: this.anims.generateFrameNames('penguin', {
+                prefix: 'penguin_',
+                start: 58,
+                end: 70
             }),
-            frameRate: 10,
+            frameRate: 20,
             repeat: -1
         });
 
@@ -435,14 +466,63 @@ class PlayScene extends Phaser.Scene {
 
         this.anims.create({
             key: 'idle',
-            frames: [{ key: 'player', frame: 'jefrens_2' }],
-            frameRate: 10
+            frames: this.anims.generateFrameNames('penguin', {
+                prefix: 'penguin_',
+                start: 21,
+                end: 27
+            }),
+            frameRate: 10,
+            repeat: -1
         });
 
         this.anims.create({
             key: 'jump',
-            frames: [{ key: 'player', frame: 'jefrens_5' }],
-            frameRate: 10
+            frames: this.anims.generateFrameNames('penguin', {
+                prefix: 'penguin_',
+                start: 21,
+                end: 23
+            }),
+            frameRate: 2
+        });
+
+        this.anims.create({
+            key: 'slide',
+            frames: this.anims.generateFrameNames('penguin', {
+                prefix: 'penguin_',
+                start: 28,
+                end: 28
+            }),
+            frameRate: 1
+        });
+
+        this.anims.create({
+            key: 'slideStart',
+            frames: this.anims.generateFrameNames('penguin', {
+                prefix: 'penguin_',
+                start: 1,
+                end: 21
+            }),
+            frameRate: 20
+        });
+
+        this.anims.create({
+            key: 'slideJump',
+            frames: this.anims.generateFrameNames('penguin', {
+                prefix: 'penguin_',
+                start: 28,
+                end: 32
+            }),
+            frameRate: 20
+        });
+
+        this.anims.create({
+            key: 'slideLand',
+            frames: this.anims.generateFrameNames('penguin', {
+                prefix: 'penguin_',
+                start: 33,
+                end: 38
+            }),
+            frameRate: 40
         });
 
         this.anims.create({
