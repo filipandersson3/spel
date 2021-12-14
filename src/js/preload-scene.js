@@ -15,6 +15,12 @@ class PreloadScene extends Phaser.Scene {
         this.load.image('snowy', '/images/snowy.png');
         this.load.image('zeunerts', '/images/zeunerts_julmust.png');
         this.load.image('icicle', '/images/icicles.png')
+        this.load.audio('racemusic', '/audio/racemusic.mp3');
+        this.load.audio('shopmusic', '/audio/shopmusic.mp3');
+        this.load.audio('slurp', '/audio/slurp.mp3');
+        this.load.audio('wind', '/audio/wind.mp3');
+        this.load.audio('vineboom', '/audio/vineboom.mp3');
+        this.load.audio('freezing', '/audio/freezing.mp3')
         this.load.atlas(
             'player',
             '/images/jefrens_hero.png',

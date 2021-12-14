@@ -46,6 +46,11 @@ class PlayScene extends Phaser.Scene {
         this.shop.body.immovable = true;
         this.shop.body.moves = false;
 
+        this.shopGuy = this.physics.add.sprite(70, this.game.config.height-136, 'shopGuy').setScale(3);
+        this.shopGuy.body.immovable = true;
+        this.shopGuy.body.moves = false;
+        this.shopGuy.play('shopGuyIdle', true);
+
         // skapa en spelare och ge den studs
         this.player = this.physics.add.sprite(this.spawns.objects[0].x, this.spawns.objects[0].y, 'player');
         this.player.setBounce(0.1);
@@ -64,7 +69,7 @@ class PlayScene extends Phaser.Scene {
         // i tilemappen finns det ett lager Spikes
         // som innehåller spikarnas position
         console.log(this.platforms);
-        map.getObjectLayer('spikes').objects.forEach((spike) => {
+        /*map.getObjectLayer('spikes').objects.forEach((spike) => {
             // iterera över spikarna, skapa spelobjekt
             const spikeSprite = this.spikes
                 .create(spike.x, spike.y, 'spike')
@@ -72,7 +77,7 @@ class PlayScene extends Phaser.Scene {
             spikeSprite.body
                 .setSize(spike.width, spike.height - 20)
                 .setOffset(0, 20);
-        });
+        });*/
         // lägg till en collider mellan spelare och spik
         // om en kollision sker, kör callback metoden playerHit
         this.physics.add.collider(
@@ -145,22 +150,39 @@ class PlayScene extends Phaser.Scene {
 
         this.shopText = this.add.text(5, 220, `purchase my wares \n press 'E'`, { fontFamily: '"PressStart2P"' });
         this.isShopOpen = false;
-
-        this.shopGuy = this.physics.add.sprite(70, this.game.config.height-136, 'shopGuy').setScale(3);
-        this.shopGuy.body.immovable = true;
-        this.shopGuy.body.moves = false;
-        this.shopGuy.play('shopGuyIdle', true);
+        this.wind = this.sound.add('wind');
+        this.wind.play({loop:true});
+        this.racemusic = this.sound.add('racemusic');
+        this.shopmusic = this.sound.add('shopmusic');
+        this.shopmusic.play({loop:true});
+        this.freezing = this.sound.add('freezing');
     }
 
     // play scenens update metod
     update() {
-        console.log(this.game.speed);
+        if (this.player.body.velocity.x > 100) {
+            this.wind.setVolume(this.player.body.speed/1500);
+        } else {
+            this.wind.setVolume(0.2);
+        }
+        if (this.player.x > 100) {
+            this.shopmusic.setVolume(100/this.player.x);
+        }
+        if (this.player.x > 500 && this.racemusic.isPlaying == false) {
+            this.racemusic.play();
+            this.racemusic.setVolume(0.5)
+        }
         // för pause
         if (this.keyObj.isDown) {
+            this.racemusic.pause();
+            this.wind.pause();
             // pausa nuvarande scen
             this.scene.pause();
             // starta menyscenene
             this.scene.launch('MenuScene');
+        } else {
+            this.racemusic.resume();
+            this.wind.pause();
         }
         if (this.player.x < 250) {
             if (Phaser.Input.Keyboard.JustDown(this.eKeyObj)) {
@@ -250,10 +272,16 @@ class PlayScene extends Phaser.Scene {
             this.player.setVelocityY(300);
             this.coldMeter.width = 0;
             this.player.play('jump', true)
+            if (this.racemusic.isPaused == false) {
+                this.racemusic.pause();
+            }
+            if (this.freezing.isPlaying == false && this.player.x > 500) {
+                this.freezing.play({volume: 0.6});
+            }
             this.time.addEvent({ delay: 5000, callback: this.restart, callbackScope: this});
         }
         if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(50000/this.player.body.velocity.x) == 0) {
-            this.obstacle = this.physics.add.sprite(this.player.x+500, this.game.config.height - 96, 'snowy');
+            this.obstacle = this.physics.add.sprite(this.player.x+500, this.game.config.height - 96, 'snowy').setScale(0.5);
             this.physics.add.collider(this.obstacle, this.platforms);
             this.physics.add.overlap(
                 this.player,
@@ -262,8 +290,7 @@ class PlayScene extends Phaser.Scene {
                 null,
                 this
             );
-            this.obstacle.body.setVelocityX(-30);
-            this.obstacle.setTint(0xFF0000);
+            this.obstacle.body.setVelocityX(0);
         }
         if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(30000/this.player.body.velocity.x) == 0) {
             this.zeunerts = this.physics.add.sprite(this.player.x+500, this.game.config.height - 96, 'zeunerts');
@@ -304,7 +331,9 @@ class PlayScene extends Phaser.Scene {
                     null,
                     this
                 );
-                this.icicle = this.physics.add.sprite(this.player.x+452+(i*48), this.game.config.height - 312, 'icicle');
+                this.icicle = this.physics.add.sprite(this.player.x+452+(i*48), this.game.config.height - 250, 'icicle').setScale(3);
+                this.icicle.body.immovable = true;
+                this.icicle.body.moves = false;
             }
         }
     }
@@ -329,6 +358,8 @@ class PlayScene extends Phaser.Scene {
         if (this.player.x > this.game.maxdistance) {
             this.game.maxdistance = this.player.x;
         }
+        this.shopmusic.stop();
+        this.freezing.setVolume(0);
         this.scene.restart();
     }
 
@@ -353,6 +384,7 @@ class PlayScene extends Phaser.Scene {
     playerHitFoe(player, foe) {
         player.setVelocityX(player.body.velocity.x*0.7);
         foe.setX(0);
+        this.sound.play('vineboom',{volume:0.6});
     }
 
     playerHitRamp(player, ramp) {
@@ -374,6 +406,7 @@ class PlayScene extends Phaser.Scene {
         player.setVelocityY(player.body.velocity.y - 20);
         this.game.zeunerts++;
         zeunerts.setX(0);
+        this.sound.play('slurp',{volume:0.6});
     }
 
     // när vi skapar scenen så körs initAnims för att ladda spelarens animationer
