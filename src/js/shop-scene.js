@@ -71,6 +71,7 @@ class PreloadScene extends Phaser.Scene {
 
     // scenens uppdate metod, lyssnar på keyDown
     update() {
+        console.log(this.cursorPos);
         if (Phaser.Input.Keyboard.JustDown(this.cursors.down)) {
             if (this.cursorPos < this.itemList.length-1) {
                 this.cursorPos++;
@@ -84,10 +85,10 @@ class PreloadScene extends Phaser.Scene {
         }
         this.shopCursor.y = 198+this.cursorPos*32
         if (Phaser.Input.Keyboard.JustDown(this.fkeyObj)) {
-            if (this.game.zeunerts >= this.itemList[this.cursorPos].getData("cost")
+            if (this.game.zeunerts >= parseInt(this.itemList[this.cursorPos].getData("cost"))
             && this.game.upgrades[this.cursorPos] == false) {
                 console.log("item " + this.cursorPos + " bought");
-                this.game.zeunerts -= this.itemList[this.cursorPos].getData("cost");
+                this.game.zeunerts -= parseInt(this.itemList[this.cursorPos].getData("cost"));
                 this.game.upgrades[this.cursorPos] = true;
                 this.game.speed += parseInt(this.itemList[this.cursorPos].getData("speedGain"));
             }

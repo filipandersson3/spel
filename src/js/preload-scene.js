@@ -40,7 +40,7 @@ class PreloadScene extends Phaser.Scene {
         this.game.maxdistance = 0;
         this.game.speed = 90;
         this.game.upgrades = [false,false,false,false];
-        this.game.zeunerts = 90;
+        this.game.zeunerts = 300;
     }
 
     create() {

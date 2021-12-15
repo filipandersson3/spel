@@ -40,6 +40,12 @@ class PlayScene extends Phaser.Scene {
         //     this.platforms
         // );
         // platforms.setCollision(1, true, true);
+        this.physics.world.setBounds(0,-300, 31000, this.game.config.height+300);
+
+        this.endhouse = this.physics.add.sprite(31000, this.game.config.height - 136, 'shop').setScale(3);
+        this.physics.add.collider(this.endhouse, this.platforms);
+        this.endhouse.body.immovable = true;
+        this.endhouse.body.moves = false;
 
         this.shop = this.physics.add.sprite(70, this.game.config.height - 136, 'shop').setScale(3);
         this.physics.add.collider(this.shop, this.platforms);
@@ -54,7 +60,7 @@ class PlayScene extends Phaser.Scene {
         // skapa en spelare och ge den studs
         this.player = this.physics.add.sprite(this.spawns.objects[0].x, this.spawns.objects[0].y, 'penguin');
         this.player.setBounce(0.1);
-        this.player.setCollideWorldBounds(false);
+        this.player.setCollideWorldBounds(true);
 
         this.zeunertsCounter = 0;
 
@@ -176,21 +182,24 @@ class PlayScene extends Phaser.Scene {
             this.shopmusic.setVolume(100/this.player.x);
         }
         if (this.player.x > 500 && this.racemusic.isPlaying == false) {
-            this.racemusic.play();
+            //this.racemusic.play();
             this.racemusic.setVolume(0.5)
         }
         // för pause
         if (this.keyObj.isDown) {
             this.racemusic.pause();
             this.wind.pause();
+            this.shopmusic.pause();
             // pausa nuvarande scen
             this.scene.pause();
             // starta menyscenene
             this.scene.launch('MenuScene');
-        } else {
+        } else if (this.wind.isPaused) {
+            this.wind.resume();
             this.racemusic.resume();
-            this.wind.pause();
+            this.shopmusic.resume();
         }
+
         if (this.player.x < 250) {
             if (Phaser.Input.Keyboard.JustDown(this.eKeyObj)) {
                 if (this.isShopOpen) {
@@ -208,12 +217,6 @@ class PlayScene extends Phaser.Scene {
             this.scene.pause('ShopScene');
             this.scene.setVisible(false, 'ShopScene');
             this.isShopOpen = false;
-        }
-        if (this.isShopOpen) {
-            if (Phaser.Input.Keyboard.JustDown(this.fKeyObj) && this.game.zeunerts >= 10) {
-                this.game.speed += 10;
-                this.game.zeunerts -= 10;
-            }
         }
 
         // följande kod är från det tutorial ni gjort tidigare
@@ -287,8 +290,13 @@ class PlayScene extends Phaser.Scene {
                 this.cameras.main.scrollX = playerMiddle + 50;
             }
         }
-        if (this.player.x > 500) {
+        if (this.player.x > 500 && this.player.x < 30000) {
             this.cold++;
+        } 
+        if (this.player.x > 30500) {
+            if (this.winText == null) {
+                this.winText = this.add.text(this.player.x-220, this.game.config.height-300, `your is winner ! :D`, { fontFamily: '"PressStart2P"' }).setScrollFactor(0);
+            }
         }
         this.coldMeter.width = (1000-this.cold)*this.maxColdMeterWidth;
         this.updateText();
@@ -302,53 +310,28 @@ class PlayScene extends Phaser.Scene {
             if (this.freezing.isPlaying == false && this.player.x > 500) {
                 this.freezing.play({volume: 0.6});
             }
-            this.player.play('slideLand', true);
+            this.player.play('slide', true);
             this.time.addEvent({ delay: 5000, callback: this.restart, callbackScope: this});
         }
-        if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(50000/this.player.body.velocity.x) == 0) {
-            this.obstacle = this.physics.add.sprite(this.player.x+500, this.game.config.height - 96, 'snowy').setScale(0.5);
-            this.physics.add.collider(this.obstacle, this.platforms);
-            this.physics.add.overlap(
-                this.player,
-                this.obstacle,
-                this.playerHitFoe,
-                null,
-                this
-            );
-            this.obstacle.body.setVelocityX(0);
+        if (this.player.y > this.game.config.height) {
+            this.player.y = 0
         }
-        if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(30000/this.player.body.velocity.x) == 0) {
-            this.zeunerts = this.physics.add.sprite(this.player.x+500, this.game.config.height - 96, 'zeunerts');
-            this.physics.add.collider(this.zeunerts, this.platforms);
-            this.physics.add.overlap(
-                this.player,
-                this.zeunerts,
-                this.playerHitZeunerts,
-                null,
-                this
-            );
-        }
-        if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(70000/this.player.body.velocity.x) == 0) {
-            this.ramp = this.physics.add.sprite(this.player.x+500, this.game.config.height - 80, 'ramp').setScale(2);
-            this.physics.add.collider(this.ramp, this.platforms);
-            this.physics.add.overlap(
-                this.player,
-                this.ramp,
-                this.playerHitRamp,
-                null,
-                this
-            );
-            this.ramp.body.immovable = true;
-            this.ramp.body.moves = false;
-        }
-        if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(90000/this.player.body.velocity.x) == 0) {
-            this.skyPlatform = this.physics.add.sprite(this.player.x+500, this.game.config.height - 300, 'skyPlatform').setScale(3);
-            this.physics.add.collider(this.skyPlatform, this.player);
-            this.skyPlatform.body.immovable = true;
-            this.skyPlatform.body.moves = false;
-            for (var i = 0; i<3; i++) {
-                this.zeunerts = this.physics.add.sprite(this.player.x+452+(i*48), this.game.config.height - 360, 'zeunerts');
-                this.physics.add.collider(this.zeunerts, this.skyPlatform);
+        if (this.player.x < 30000) {
+            if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(50000/this.player.body.velocity.x) == 0) {
+                this.obstacle = this.physics.add.sprite(this.player.x+500, this.game.config.height - 96, 'snowy').setScale(0.5);
+                this.physics.add.collider(this.obstacle, this.platforms);
+                this.physics.add.overlap(
+                    this.player,
+                    this.obstacle,
+                    this.playerHitFoe,
+                    null,
+                    this
+                );
+                this.obstacle.body.setVelocityX(0);
+            }
+            if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(30000/this.player.body.velocity.x) == 0) {
+                this.zeunerts = this.physics.add.sprite(this.player.x+500, this.game.config.height - 96, 'zeunerts');
+                this.physics.add.collider(this.zeunerts, this.platforms);
                 this.physics.add.overlap(
                     this.player,
                     this.zeunerts,
@@ -356,9 +339,39 @@ class PlayScene extends Phaser.Scene {
                     null,
                     this
                 );
-                this.icicle = this.physics.add.sprite(this.player.x+452+(i*48), this.game.config.height - 250, 'icicle').setScale(3);
-                this.icicle.body.immovable = true;
-                this.icicle.body.moves = false;
+            }
+            if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(70000/this.player.body.velocity.x) == 0) {
+                this.ramp = this.physics.add.sprite(this.player.x+500, this.game.config.height - 80, 'ramp').setScale(2);
+                this.physics.add.collider(this.ramp, this.platforms);
+                this.physics.add.overlap(
+                    this.player,
+                    this.ramp,
+                    this.playerHitRamp,
+                    null,
+                    this
+                );
+                this.ramp.body.immovable = true;
+                this.ramp.body.moves = false;
+            }
+            if (this.player.body.velocity.x > 1000 && Math.round(this.cold)%Math.round(90000/this.player.body.velocity.x) == 0) {
+                this.skyPlatform = this.physics.add.sprite(this.player.x+500, this.game.config.height - 300, 'skyPlatform').setScale(3);
+                this.physics.add.collider(this.skyPlatform, this.player);
+                this.skyPlatform.body.immovable = true;
+                this.skyPlatform.body.moves = false;
+                for (var i = 0; i<3; i++) {
+                    this.zeunerts = this.physics.add.sprite(this.player.x+452+(i*48), this.game.config.height - 360, 'zeunerts');
+                    this.physics.add.collider(this.zeunerts, this.skyPlatform);
+                    this.physics.add.overlap(
+                        this.player,
+                        this.zeunerts,
+                        this.playerHitZeunerts,
+                        null,
+                        this
+                    );
+                    this.icicle = this.physics.add.sprite(this.player.x+452+(i*48), this.game.config.height - 250, 'icicle').setScale(3);
+                    this.icicle.body.immovable = true;
+                    this.icicle.body.moves = false;
+                }
             }
         }
     }
@@ -415,7 +428,7 @@ class PlayScene extends Phaser.Scene {
     playerHitFoe(player, foe) {
         player.setVelocityX(player.body.velocity.x*0.7);
         foe.setX(0);
-        this.sound.play('vineboom',{volume:0.6});
+        this.sound.play('vineboom',{volume:2});
     }
 
     playerHitRamp(player, ramp) {
