@@ -35,7 +35,7 @@ class PreloadScene extends Phaser.Scene {
         this.load.atlas('shopGuy', '/images/shopGuy.png', '/images/shopGuy.json')
         this.load.atlas('penguin', '/images/penguin.png', '/images/penguin.json')
         // här laddar vi in en tilemap med spelets "karta"
-        this.load.tilemapTiledJSON('map', '/tilemaps/link.json');
+        this.load.tilemapTiledJSON('map', '/tilemaps/test.json');
         this.add.text(0, 0, '', { fontFamily: '"PressStart2P"' });
         this.game.maxdistance = 0;
         this.game.speed = 90;
