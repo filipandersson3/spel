@@ -8,6 +8,9 @@ class PreloadScene extends Phaser.Scene {
         // nu är det på scenen, därför behöver vi skapa input igen
         this.keyObj = this.input.keyboard.addKey('E', true, false);
         this.fkeyObj = this.input.keyboard.addKey('F', true, false);
+        this.enterkeyObj = this.input.keyboard.addKey('ENTER', true, false);
+        this.wkeyObj = this.input.keyboard.addKey('W', true, false);
+        this.skeyObj = this.input.keyboard.addKey('S', true, false);
 
         // spelets config om vi behöver något från den, som width height
         // console.log(this.game.config)
@@ -61,7 +64,7 @@ class PreloadScene extends Phaser.Scene {
             fixedHeight: this.game.config.height,
         })
         .setData("cost","100")
-        .setData("speedGain","50");
+        .setData("speedGain","60");
 
         this.itemList = [this.textItem1,this.textItem2,this.textItem3,this.textItem4];
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -72,19 +75,19 @@ class PreloadScene extends Phaser.Scene {
     // scenens uppdate metod, lyssnar på keyDown
     update() {
         console.log(this.cursorPos);
-        if (Phaser.Input.Keyboard.JustDown(this.cursors.down)) {
+        if (Phaser.Input.Keyboard.JustDown(this.cursors.down) || Phaser.Input.Keyboard.JustDown(this.skeyObj)) {
             if (this.cursorPos < this.itemList.length-1) {
                 this.cursorPos++;
             }
             
         }
-        if (Phaser.Input.Keyboard.JustDown(this.cursors.up)) {
+        if (Phaser.Input.Keyboard.JustDown(this.cursors.up) || Phaser.Input.Keyboard.JustDown(this.wkeyObj)) {
             if (this.cursorPos > 0) {
                 this.cursorPos--;
             }
         }
         this.shopCursor.y = 198+this.cursorPos*32
-        if (Phaser.Input.Keyboard.JustDown(this.fkeyObj)) {
+        if (Phaser.Input.Keyboard.JustDown(this.enterkeyObj) || Phaser.Input.Keyboard.JustDown(this.fkeyObj)) {
             if (this.game.zeunerts >= parseInt(this.itemList[this.cursorPos].getData("cost"))
             && this.game.upgrades[this.cursorPos] == false) {
                 console.log("item " + this.cursorPos + " bought");

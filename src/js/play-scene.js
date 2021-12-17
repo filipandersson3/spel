@@ -42,10 +42,17 @@ class PlayScene extends Phaser.Scene {
         // platforms.setCollision(1, true, true);
         this.physics.world.setBounds(0,-300, 31000, this.game.config.height+300);
 
-        this.endhouse = this.physics.add.sprite(31000, this.game.config.height - 136, 'shop').setScale(3);
+        this.endhouse = this.physics.add.sprite(31370, this.game.config.height - 190, 'factory').setScale(5);
         this.physics.add.collider(this.endhouse, this.platforms);
         this.endhouse.body.immovable = true;
         this.endhouse.body.moves = false;
+
+        for (let index = 0; index < 30; index++) {
+            this.endZeunerts = this.physics.add.sprite(31030+index*32, this.game.config.height - 96, 'zeunerts').setScale(1);
+            this.endZeunerts.body.immovable = true;
+            this.endZeunerts.body.moves = false;
+            
+        }
 
         this.shop = this.physics.add.sprite(70, this.game.config.height - 136, 'shop').setScale(3);
         this.physics.add.collider(this.shop, this.platforms);
@@ -117,6 +124,10 @@ class PlayScene extends Phaser.Scene {
         this.keyObj = this.input.keyboard.addKey('W', true, false);
         this.eKeyObj = this.input.keyboard.addKey('E', true, false);
         this.fKeyObj = this.input.keyboard.addKey('F', true, false);
+        this.aKeyObj = this.input.keyboard.addKey('A', true, false);
+        this.sKeyObj = this.input.keyboard.addKey('S', true, false);
+        this.dKeyObj = this.input.keyboard.addKey('D', true, false);
+        this.esckeyObj = this.input.keyboard.addKey('ESC', true, false);
 
         // exempel för att lyssna på events
         this.events.on('pause', function () {
@@ -129,19 +140,19 @@ class PlayScene extends Phaser.Scene {
 //        this.timerEvent = this.time.addEvent({ delay: 500, repeat: 0 });
         this.rampSwitch = false;
 
-        this.HUDBar = this.add.rectangle(450, 35, 900, 70, 0x303030).setScrollFactor(0);
+        this.HUDBar = this.add.rectangle(450, 35, 900, 70, 0x303030).setScrollFactor(0).setDepth(10);
 
-        this.HUDBar2 = this.add.rectangle(350, 33, 205, 20, 0x545454).setScrollFactor(0);
+        this.HUDBar2 = this.add.rectangle(350, 33, 205, 20, 0x545454).setScrollFactor(0).setDepth(10);
 
-        this.HUDColdText = this.add.text(40, 25, 'Temperature:', { fontFamily: '"PressStart2P"' }).setScrollFactor(0);
+        this.HUDColdText = this.add.text(40, 25, 'Temperature:', { fontFamily: '"PressStart2P"' }).setScrollFactor(0).setDepth(10);
 
-        this.coldMeter = this.add.rectangle(350, 33, 200, 10, 0x9966ff).setScrollFactor(0);
+        this.coldMeter = this.add.rectangle(350, 33, 200, 10, 0x9966ff).setScrollFactor(0).setDepth(10);
 
         this.maxColdMeterWidth = 0.2;
 
-        this.HUDZeunertsText = this.add.text(500, 25, 'Zeunerts:', { fontFamily: '"PressStart2P"' }).setScrollFactor(0);
+        this.HUDZeunertsText = this.add.text(500, 25, 'Zenarts:', { fontFamily: '"PressStart2P"' }).setScrollFactor(0).setDepth(10);
 
-        this.HUDDistanceText = this.add.text(720, 25, '0 m', { fontFamily: '"PressStart2P"' }).setScrollFactor(0);
+        this.HUDDistanceText = this.add.text(720, 25, '0 m', { fontFamily: '"PressStart2P"' }).setScrollFactor(0).setDepth(10);
 
         this.updateText();
 
@@ -167,6 +178,7 @@ class PlayScene extends Phaser.Scene {
         this.shopmusic = this.sound.add('shopmusic');
         this.shopmusic.play({loop:true});
         this.freezing = this.sound.add('freezing');
+        this.endmusic = this.sound.add('endmusic');
 
         this.player.on('animationcomplete', this.animcomplete);
     }
@@ -186,7 +198,7 @@ class PlayScene extends Phaser.Scene {
             this.racemusic.setVolume(0.5)
         }
         // för pause
-        if (this.keyObj.isDown) {
+        if (this.esckeyObj.isDown) {
             this.racemusic.pause();
             this.wind.pause();
             this.shopmusic.pause();
@@ -210,6 +222,10 @@ class PlayScene extends Phaser.Scene {
                     this.scene.launch('ShopScene');
                     this.isShopOpen = true;
                 }
+            } else if (this.esckeyObj.isDown && this.isShopOpen) {
+                this.scene.pause('ShopScene');
+                this.scene.setVisible(false, 'ShopScene');
+                this.isShopOpen = false;
             }
             this.shopText.alpha = 1;
         } else {
@@ -221,12 +237,12 @@ class PlayScene extends Phaser.Scene {
 
         // följande kod är från det tutorial ni gjort tidigare
         // Control the player with left or right keys
-        if (this.cursors.left.isDown) {
+        if (this.cursors.left.isDown || this.aKeyObj.isDown) {
             this.player.setVelocityX(-200);
             if (this.player.body.onFloor()) {
                 this.player.play('walk', true);
             }
-        } else if (this.cursors.right.isDown && !this.flipFlop) {
+        } else if ((this.cursors.right.isDown || this.dKeyObj.isDown) && !this.flipFlop) {
             this.player.setVelocityX(this.player.body.velocity.x+this.game.speed);
             this.flipFlop = true;
         } else {
@@ -241,21 +257,21 @@ class PlayScene extends Phaser.Scene {
                 } else {
                     if (this.player.body.velocity.y < -25) {
                         this.player.play('slideLand', true);
-                    } else if (this.player.body.velocity.x < 500) {
+                    } else if (this.player.body.velocity.x < 400) {
                         this.player.play('walk', true);
                     } else {
                         if (!(this.player.anims.currentAnim.key === 'slide') &&
                             !(this.player.anims.currentAnim.key === 'slideLand')) {
                             this.player.play('slideStart', true);
                         }
-                        else {
+                        else if (!(this.rampSwitch == true)) {
                             this.player.play('slide', true);
                         }
                     }
                 }
                 
             }
-            if (this.cursors.right.isUp) {
+            if (this.cursors.right.isUp && this.dKeyObj.isUp) {
                 this.flipFlop = false;
             }
         }
@@ -263,7 +279,7 @@ class PlayScene extends Phaser.Scene {
         // Player can jump while walking any direction by pressing the space bar
         // or the 'UP' arrow
         if (
-            (this.cursors.space.isDown || this.cursors.up.isDown) &&
+            (this.cursors.space.isDown || this.cursors.up.isDown || this.keyObj.isDown) &&
             this.player.body.onFloor()) 
         {
             this.player.setVelocityY(-350);
@@ -293,10 +309,15 @@ class PlayScene extends Phaser.Scene {
         if (this.player.x > 500 && this.player.x < 30000) {
             this.cold++;
         } 
-        if (this.player.x > 30500) {
+        if (this.player.x > 30700) {
             if (this.winText == null) {
                 this.winText = this.add.text(this.player.x-220, this.game.config.height-300, `your is winner ! :D`, { fontFamily: '"PressStart2P"' }).setScrollFactor(0);
             }
+            this.racemusic.setVolume(0);
+            if (!this.endmusic.isPlaying) {
+                this.endmusic.play();
+            }
+            this.scene.launch('EndScene');
         }
         this.coldMeter.width = (1000-this.cold)*this.maxColdMeterWidth;
         this.updateText();
@@ -310,6 +331,11 @@ class PlayScene extends Phaser.Scene {
             if (this.freezing.isPlaying == false && this.player.x > 500) {
                 this.freezing.play({volume: 0.6});
             }
+            if (this.endmusic.isPaused == false) {
+                this.endmusic.pause();
+            }
+            this.scene.pause('EndScene');
+            this.scene.setVisible(false, 'EndScene');
             this.player.play('slide', true);
             this.time.addEvent({ delay: 5000, callback: this.restart, callbackScope: this});
         }
@@ -378,11 +404,8 @@ class PlayScene extends Phaser.Scene {
 
     // metoden updateText för att uppdatera overlaytexten i spelet
     updateText() {
-        this.text.setText(
-            `Zeunerts: ${this.game.zeunerts} Cold: ${this.cold} Distance: ${Math.round(this.player.x/32)} Speed: ${Math.round(this.player.body.speed/10)}`
-        );
         this.HUDZeunertsText.setText(
-            `Zeunerts: ${this.game.zeunerts}`
+            `Zenarts: ${this.game.zeunerts}`
         );
         if (Math.round(this.player.x/32) > 9) {
             this.HUDDistanceText.setText(
@@ -402,7 +425,7 @@ class PlayScene extends Phaser.Scene {
     }
 
     animcomplete() {
-        if (this.body.onFloor() && this.body.velocity.x > 500) {
+        if (this.body.onFloor() && this.body.velocity.x > 500 && !(this.rampSwitch == true)) {
             this.play('slide', true);
         }
     }
@@ -436,6 +459,7 @@ class PlayScene extends Phaser.Scene {
             player.setVelocityX(player.body.speed*0.7);
             player.setVelocityY(player.body.speed*-0.7);
             this.rampSwitch = true;
+            this.player.play('slideJump', true);
             this.time.addEvent({ delay: 1000, callback: this.changeRampSwitch, callbackScope: this});
         }
         

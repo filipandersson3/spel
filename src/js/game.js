@@ -3,6 +3,7 @@ import PlayScene from './play-scene';
 import PreloadScene from './preload-scene';
 import MenuScene from './menu-scene';
 import ShopScene from './shop-scene';
+import EndScene from './end-scene';
 
 const eventsCenter = new Phaser.Events.EventEmitter()
 
@@ -20,7 +21,7 @@ const config = {
             debug: false
         }
     },
-    scene: [PreloadScene, PlayScene, MenuScene, ShopScene],
+    scene: [PreloadScene, PlayScene, MenuScene, ShopScene, EndScene],
     parent: 'game'
 };
 
