@@ -182,7 +182,7 @@ class PlayScene extends Phaser.Scene {
             this.shopmusic.setVolume(100/this.player.x);
         }
         if (this.player.x > 500 && this.racemusic.isPlaying == false) {
-            //this.racemusic.play();
+            this.racemusic.play();
             this.racemusic.setVolume(0.5)
         }
         // för pause
