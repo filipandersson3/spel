@@ -146,7 +146,7 @@ class PlayScene extends Phaser.Scene {
 
         this.HUDColdText = this.add.text(40, 25, 'Temperature:', { fontFamily: '"PressStart2P"' }).setScrollFactor(0).setDepth(10);
 
-        this.coldMeter = this.add.rectangle(350, 33, 200, 10, 0x9966ff).setScrollFactor(0).setDepth(10);
+        this.coldMeter = this.add.rectangle(350, 33, 200, 10, 0x5c7aff).setScrollFactor(0).setDepth(10);
 
         this.maxColdMeterWidth = 0.2;
 
@@ -329,7 +329,7 @@ class PlayScene extends Phaser.Scene {
                 this.racemusic.pause();
             }
             if (this.freezing.isPlaying == false && this.player.x > 500) {
-                this.freezing.play({volume: 0.6});
+                this.freezing.play({volume: 0.6, loop: false});
             }
             if (this.endmusic.isPaused == false) {
                 this.endmusic.pause();
@@ -419,8 +419,8 @@ class PlayScene extends Phaser.Scene {
         if (this.player.x > this.game.maxdistance) {
             this.game.maxdistance = this.player.x;
         }
-        this.shopmusic.stop();
         this.freezing.setVolume(0);
+        this.game.sound.stopAll();
         this.scene.restart();
     }
 
